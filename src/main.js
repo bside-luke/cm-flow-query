@@ -1,32 +1,41 @@
 const prompts = require('prompts');
 const chalk = require('chalk');
-const { getNFTs, getCollections } = require('./queries');
+const {
+  getNFTs,
+  getCollections
+} = require('./queries');
+const readline = require('readline');
+
+const pause = () => {
+  const wait = readline.createInterface({
+    input: process.stdin
+  });
+  return new Promise(resolve => wait.question("", () => resolve(wait.close())));
+}
 
 const main = async () => {
-  const response = await prompts([
-    {
+  const response = await prompts([{
       type: 'select',
       name: 'query',
       message: 'What are we attempting to query?',
       choices: [{
-        title: 'NFTs',
-        description: 'Returns all NFTs for the given address/addresses',
-        value: getNFTs,
-      },
-      {
-        title: 'Collections',
-        description: 'Returns all collections for the given address/addresses',
-        value: getCollections,
-        disabled: true,
-      },
+          title: 'NFTs',
+          description: 'Returns all NFTs for the given address/addresses',
+          value: getNFTs,
+        },
+        {
+          title: 'Collections',
+          description: 'Returns all collections for the given address/addresses',
+          value: getCollections,
+          disabled: true,
+        },
       ],
     },
     {
       type: 'select',
       name: 'output',
       message: 'What format would you like the output to be in?',
-      choices: [
-        {
+      choices: [{
           title: 'human',
           description: 'Output data in a human readable way to stdout',
           value: 'human',
@@ -60,6 +69,9 @@ const main = async () => {
           : ', '}`).join('')}`).join('\n'));
     }
   }
+
+  await pause()
+
 };
 
 main();
