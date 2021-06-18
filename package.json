@@ -9,6 +9,9 @@
     "chalk": "^4.1.1",
     "prompts": "^2.4.1"
   },
+  "scripts": {
+    "build": "pkg . --compress GZip"
+  },
   "pkg": {
     "scripts": "src/main.js",
     "targets": [
@@ -17,5 +20,10 @@
       "node14-macos-x64"
     ],
     "outputPath": "dist"
+  },
+  "devDependencies": {
+    "eslint": "^7.28.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4"
   }
 }
