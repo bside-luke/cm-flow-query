@@ -3,7 +3,8 @@ const chalk = require('chalk');
 const {
   getNFTs,
   getCollections,
-  getBalance
+  getBalance,
+  getAccountStorage
 } = require('./queries');
 const readline = require('readline');
 
@@ -32,6 +33,10 @@ const main = async () => {
           title: 'Balance',
           description: 'Returns the account balance of the given address/addresses',
           value: getBalance,
+        }, {
+          title: 'Storage',
+          description: 'Returns the storage capacity of the given address/addresses',
+          value: getAccountStorage,
         },
       ],
     },
@@ -73,14 +78,27 @@ const main = async () => {
           ? ((d + 1) === a.length ? '.' : ',\n')
           : ', '}`).join('')}`).join('\n'));
       }
-    } else {
+    } else if (response.query === getBalance) {
       const res = await Promise.all(addresses.map(response.query));
       if (response.output === 'json') {
         console.log(JSON.stringify(res, null, 2));
       } else {
         console.log(res.map(account => `\tAddress: ${account.address}
         Flow: ${account.flow}
-        FUSD: ${account.fusd}\n`).join('\n'));
+        FUSD: ${account.fusd}`).join('\n\n'));
+      }
+    } else {
+      const res = await Promise.all(addresses.map(response.query));
+      if (response.output === 'json') {
+        console.log(JSON.stringify(res, null, 2));
+      } else {
+        console.log(res.map(account => `\t${chalk.yellow(account.address)}:
+        \t${chalk.cyan('Capacity:')} ${chalk.green(account.capacity)}
+        \t${chalk.cyan('Used:')} ${chalk.green(account.used)}
+        \t${chalk.cyan('Available:')} ${chalk.green(account.available)}
+        \t${chalk.cyan('percentage:')}` +
+        `\t${chalk.green(((account.used / account.capacity) * 100).toFixed(2) + '%')}`)
+        .join('\n\n'))
       }
     }
   }

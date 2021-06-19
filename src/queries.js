@@ -69,11 +69,38 @@ const getFlowBalance = (address) => new Promise((resolve) => {
   }).catch(() => resolve("0.00000000")).then(resolve);
 });
 
-const getBalance = async (address) => {
-    const flow = await getFlowBalance(address);
-    const fusd = await getFUSDBalance(address);
+const getAccountStorage = (address) => new Promise((resolve) => {
+  address = fcl.withPrefix(address);
+  fcl.query({
+    args: (arg, t) => [arg(address, t.Address)],
+    cadence: `pub fun main(addr: Address): {String: UInt64} {
+          let acct = getAccount(addr)
+          let ret: {String: UInt64} = {}
+          ret["capacity"] = acct.storageCapacity
+          ret["used"] = acct.storageUsed
+          ret["available"] = acct.storageCapacity - acct.storageUsed
+          return ret
+        }`
+  }).catch(() => resolve({
+    address,
+    capacity: 0,
+    used: 0,
+    available: 0
+  })).then(res => resolve({
+    address,
+    ...res
+  }));
+});
 
-    return {address, flow, fusd};
+const getBalance = async (address) => {
+  const flow = await getFlowBalance(address);
+  const fusd = await getFUSDBalance(address);
+
+  return {
+    address,
+    flow,
+    fusd
+  };
 }
 
 module.exports = {
@@ -81,5 +108,6 @@ module.exports = {
   getCollections,
   getFUSDBalance,
   getFlowBalance,
-  getBalance
+  getBalance,
+  getAccountStorage
 };
