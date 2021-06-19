@@ -15,6 +15,8 @@ const pause = () => {
   return new Promise(resolve => wait.question("", () => resolve(wait.close())));
 }
 
+const formatNumber = number => number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
 const main = async () => {
   const response = await prompts([{
       type: 'select',
@@ -93,11 +95,11 @@ const main = async () => {
         console.log(JSON.stringify(res, null, 2));
       } else {
         console.log(res.map(account => `\t${chalk.yellow(account.address)}:
-        \t${chalk.cyan('Capacity:')} ${chalk.green(account.capacity)}
-        \t${chalk.cyan('Used:')} ${chalk.green(account.used)}
-        \t${chalk.cyan('Available:')} ${chalk.green(account.available)}
-        \t${chalk.cyan('percentage:')}` +
-        `\t${chalk.green(((account.used / account.capacity) * 100).toFixed(2) + '%')}`)
+          ${chalk.cyan('Capacity:\t')} ${chalk.green(formatNumber(account.capacity))}
+          ${chalk.cyan('Used:\t\t')} ${chalk.green(formatNumber(account.used))}
+          ${chalk.cyan('Available:\t')} ${chalk.green(formatNumber(account.available))}
+          ${chalk.cyan('percentage:\t')} ` +
+          `${chalk.green(((account.used / account.capacity) * 100).toFixed(2) + '%')}`)
         .join('\n\n'))
       }
     }
